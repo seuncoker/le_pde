@@ -165,6 +165,8 @@ class Contrastive(nn.Module):
         self.decoder_act_name = decoder_act_name
         self.is_prioritized_dropout = is_prioritized_dropout
         self.vae_mode = vae_mode
+
+        #import pdb; pdb.set_trace()
         if vae_mode != "None":
             assert is_latent_flatten is True
         if decoder_act_name is None or decoder_act_name == "None":
@@ -651,6 +653,7 @@ class Contrastive(nn.Module):
             preds: having format of {key: [B, len(pred_steps), dyn_dims]}}.
             If is_recons is True, will also return recons that has format of {key: [B, 1, dyn_dims]}}.
         """
+        #import pdb; pdb.set_trace()
         def expand_static_latent(static_latent, latent):
             if isinstance(latent, tuple):
                 return tuple(expand_static_latent(static_latent, latent_ele) if latent_ele is not None else None for latent_ele in latent)
@@ -815,6 +818,7 @@ class Contrastive(nn.Module):
 
     def get_loss(self, data, args, is_rollout=False, **kwargs):
         """Get loss."""
+        #import pdb; pdb.set_trace()
         # Make prediction:
         if is_diagnose(loc="loss:0", filename=args.filename):
             pdb.set_trace()
@@ -1236,6 +1240,7 @@ def get_model(
 ):
     """Get model as specified by args."""
     # breakpoint()
+    #import pdb; pdb.set_trace()
     if len(dict(data_eg.original_shape)["n0"]) != 0:
         original_shape = to_tuple_shape(data_eg.original_shape)
         pos_dims = get_pos_dims_dict(original_shape)
@@ -1390,6 +1395,7 @@ class CNN_Encoder(nn.Module):
         self.vae_mode = vae_mode
 
         # Convolutions:
+        #import pdb; pdb.set_trace()
         for key, pos_dim in self.pos_dims.items():
             setattr(self, "conv_grid_{}".format(key),
                     nn.Sequential(get_conv_func(
@@ -1520,6 +1526,7 @@ class CNN_Encoder(nn.Module):
         use_grads=True,
         use_pos=False,
     ):
+        #import pdb; pdb.set_trace()
         data_node_feature = process_data_for_CNN(data, use_grads=use_grads, use_pos=use_pos)
         x = []
         for key in self.grid_keys:
@@ -1604,6 +1611,8 @@ class CNN_Decoder(nn.Module):
         self.n_latent_levs=n_latent_levs
         self.is_latent_flatten = is_latent_flatten
         self.reg_type_list = reg_type_list
+
+        #import pdb; pdb.set_trace()
         if decoder_act_name == "None":
             decoder_act_name = act_name
         self.decoder_act_name = decoder_act_name
@@ -1709,6 +1718,7 @@ class CNN_Decoder(nn.Module):
 
 
     def forward(self, latent, **kwargs):
+        #import pdb; pdb.set_trace()
         if not isinstance(latent, tuple):
             x = self.fc(latent)
             x = x.view(x.shape[0], -1, *self.latent_shape)
@@ -1784,6 +1794,7 @@ class Evolution_Op(nn.Module):
         self.static_latent_size=static_latent_size
         self.is_prioritized_dropout = is_prioritized_dropout
 
+        #import pdb; pdb.set_trace()
         if self.is_latent_flatten:
             evolution_op_list = []
             evolution_type_split = self.evolution_type.split("-")
@@ -1888,6 +1899,7 @@ class Evolution_Op(nn.Module):
                     raise
 
     def forward_core(self, latent):
+        #import pdb; pdb.set_trace()
         def get_Hessian_penalty_latent(G, z, reg_mode, G_z):
             return get_Hessian_penalty(
                 G=G,
@@ -1946,6 +1958,7 @@ class Evolution_Op(nn.Module):
             return tuple(latent_list)
 
     def forward(self, latent):
+        #import pdb; pdb.set_trace()
         return self.forward_core(latent)
 
 

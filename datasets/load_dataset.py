@@ -109,7 +109,8 @@ def load_data(args, **kwargs):
         dataset.n_simu = pyg_dataset.n_simu
         dataset.time_stamps = pyg_dataset.time_stamps
         return dataset
-
+    
+    #import pdb; pdb.set_trace()
     train_val_fraction = 0.9
     train_fraction = args.train_fraction
     multi_step_dict = parse_multi_step(args.multi_step)
@@ -131,8 +132,10 @@ def load_data(args, **kwargs):
         "_periodic_{}".format(args.is_1d_periodic) if args.is_1d_periodic else "",
         "_normpos_{}".format(args.is_normalize_pos) if args.is_normalize_pos is False else "",
     ))
+
     is_to_deepsnap = True
     if (os.path.isfile(filename_train_val) or args.is_test_only) and os.path.isfile(filename_test) and args.n_train == "-1":
+        
         if not args.is_test_only:
             p.print(f"Loading {filename_train_val}")
             loaded = pickle.load(open(filename_train_val, "rb"))
@@ -225,7 +228,10 @@ def load_data(args, **kwargs):
             )
             is_to_deepsnap = False
         elif args.dataset.startswith("mppde1d"):
+            print("ckecingggg")
+            print("is_test_only", args.is_test_only)
             if not args.is_test_only:
+                print("doingggggg")
                 pyg_dataset_train = MPPDE1D(
                     dataset=args.dataset,
                     input_steps=args.input_steps * args.temporal_bundle_steps,
@@ -271,16 +277,23 @@ def load_data(args, **kwargs):
             p.print(", using the following elements {}.".format(args.n_train))
         else:
             p.print(":")
-
+        
+        #import pdb; pdb.set_trace()
         # Transform to deepsnap format:
         if is_to_deepsnap:
-            if not args.is_test_only:
+            if not args.is_test_only:              
                 if "pyg_dataset_train_val" in locals():
                     dataset_train_val = to_deepsnap(pyg_dataset_train_val, args)
                 else:
-                    dataset_train = to_deepsnap(pyg_dataset_train, args)
-                    dataset_val = to_deepsnap(pyg_dataset_val, args)
-            dataset_test = to_deepsnap(pyg_dataset_test, args)
+                    #import pdb; pdb.set_trace()
+                    pyg_dataset_train_sub = pyg_dataset_train[0:5000]
+                    dataset_train = to_deepsnap(pyg_dataset_train_sub, args)
+
+                    pyg_dataset_val_sub = pyg_dataset_val[0:200]
+                    dataset_val = to_deepsnap(pyg_dataset_val_sub, args)
+            
+            pyg_dataset_test_sub = pyg_dataset_test[0:200]
+            dataset_test = to_deepsnap(pyg_dataset_test_sub, args)
         else:
             if not args.is_test_only:
                 dataset_train_val = pyg_dataset_train_val

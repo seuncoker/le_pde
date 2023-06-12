@@ -718,11 +718,12 @@ def parse_multi_step(string):
     Returns:
         multi_step_dict: E.g. {1: 1, 2: 1e-2, 4: 1e-3} for string="1^2:1e-2^4:1e-3".
     """
+    #import pdb; pdb.set_trace()
     if string == "":
         return {}
     multi_step_dict = {}
-    if "^" in string:
-        string_split = string.split("^")
+    if "*" in string:
+        string_split = string.split("*")
     else:
         string_split = string.split("$")
     for item in string_split:

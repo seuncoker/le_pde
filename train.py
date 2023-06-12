@@ -23,6 +23,7 @@ from le_pde.models import get_model, load_model, unittest_model, build_optimizer
 from le_pde.pytorch_net.util import pload, pdump, get_time, update_args, clip_grad, Batch, set_seed, update_dict, plot_matrices, make_dir, to_np_array, record_data, Early_Stopping, str2bool, get_filename_short, get_num_params, ddeepcopy as deepcopy, write_to_config
 from le_pde.utils import p, EXP_PATH, get_model_dict, get_elements, is_diagnose, get_keys_values, loss_op, to_tuple_shape, parse_string_idx_to_list, parse_multi_step, get_device, Channel_Gen, process_data_for_CNN, get_activation, get_normalization, Mean, Flatten, Permute, Reshape, to_cpu
 
+import platform
 
 # ## Initialization:
 
@@ -80,7 +81,7 @@ try:
     args.is_prioritized_dropout = False
     args.input_steps = 1
     # args.multi_step = "1^2^3^4^5^6^7^8^9^10^11^12^13^14^15^16^17^18^19^20"
-    args.multi_step = "1^2^3^4"
+    args.multi_step = "1*2*3*4"
     args.loss_type = "lp"
     
     # For fnomodel:
@@ -182,7 +183,7 @@ if args.dataset.startswith("mppde1d"):
 
 # In[ ]:
 
-
+#import pdb; pdb.set_trace()
 set_seed(args.seed)
 if "dataset_train_val" not in locals():
     (dataset_train_val, dataset_test), (train_loader, val_loader, test_loader) = load_data(args)
@@ -248,7 +249,8 @@ if args.load_filename != "None":
 
 n_params_model = get_num_params(model)
 p.print("n_params_model: {}".format(n_params_model), end="")
-machine_name = os.uname()[1].split('.')[0]
+#machine_name = os.uname()[1].split('.')[0]  #for linux
+machine_name = platform.uname()[1].split('.')[0]  #for windows
 if args.load_filename == "None" or args.load_exp_renew is True:
     data_record = {"n_params_model": n_params_model, "args": update_dict(args.__dict__, "machine_name", machine_name),
                "best_train_model_dict": [], "best_train_loss": [], "best_train_loss_history":[]}
@@ -276,14 +278,15 @@ short_str_dict = {
     "gpuid": "gpu",
     "id": "id",
 }
-
+#import pdb; pdb.set_trace()
 
 filename_short = get_filename_short(
     short_str_dict.keys(),
     short_str_dict,
     args_dict=args.__dict__,
 )
-filename = EXP_PATH + "{}_{}/".format(args.exp_id, args.date_time) + filename_short[:-2] + "_{}.p".format(machine_name)
+filename = EXP_PATH + "{}_{}/".format(args.exp_id, args.date_time) + filename_short[:-100] + "_{}.p".format(machine_name)
+
 write_to_config(args, filename)
 args.filename = filename
 p.print(filename, banner_size=100)
@@ -348,6 +351,7 @@ if args.is_pretrain_autoencode:
     args.multi_step = ""
     opt, scheduler = build_optimizer(args, model.parameters())
 
+#import pdb; pdb.set_trace()
 while epoch < args.epochs:
     total_loss = 0
     count = 0
